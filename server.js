@@ -9,10 +9,13 @@ connectDB();
 const app = express();
 // routes
 const bootcamps = require('./routes/bootcamps');
+const courses = require('./routes/courses');
 
 app.use(express.json());
 
 app.use('/api/bootcamps', bootcamps)
+app.use('/api/courses', courses)
+
 app.use(errorHandler);
 
 const PORT= process.env.PORT || 5000;
