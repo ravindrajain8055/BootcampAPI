@@ -24,7 +24,6 @@ exports.getCourses = asyncHandler( async (req, res, next) => {
 // access public
 // route GET api/courses/:id
 exports.getCourse = asyncHandler( async (req, res, next) => {
-
     const course = await Course.findById(req.params.id).populate({
         path:'bootcamp',
         select:"name"
@@ -43,12 +42,18 @@ exports.getCourse = asyncHandler( async (req, res, next) => {
 // access public
 // route POST api/bootcamps/:bootcampId/courses
 exports.addCourse = asyncHandler( async (req, res, next) => {
-    req.body.bootcamp = req.params.bootcampId
+    req.body.bootcamp = req.params.bootcampId 
+    req.body.user = req.user.id
 
-    const bootcamp = Bootcamp.findById(req.params.bootcampId);
+    const bootcamp = await Bootcamp.findById(req.params.bootcampId); 
 
     if(!bootcamp){
         return next(new ErrorResponse("no Bootcamp available",404))
+    }
+    console.log(bootcamp.user)
+    // Make sure thats its a bootcamp owner
+    if(bootcamp.user.toString() !== req.user.id && req.user.role !== "admin"){
+        return next(new ErrorResponse('User not authorized to add a course to the bootcamp',401));
     }
 
     const course = await Course.create(req.body);
@@ -68,6 +73,12 @@ exports.updateCourse = asyncHandler( async (req, res, next) => {
     if(!course){
         return next(new ErrorResponse("no course found",404))
     }
+
+    // Make sure thats its a course owner
+    if(course.user.toString() !== req.user.id && req.user.role !== "admin"){
+        return next(new ErrorResponse('User not authorized to update a course to the bootcamp',401));
+    }
+
 
     course = await Course.findByIdAndUpdate(req.params.id,req.body,{
         new:true,
@@ -90,6 +101,11 @@ exports.deleteCourse = asyncHandler( async (req, res, next) => {
         return next(new ErrorResponse("no course found",404))
     }
 
+    // Make sure thats its a bootcamp owner
+    if(course.user.toString() !== req.user.id && req.user.role !== "admin"){
+        return next(new ErrorResponse('User not authorized to delete a course to the bootcamp',401));
+    }
+
     await course.remove();
     
     res.status(200).json({
@@ -97,3 +113,4 @@ exports.deleteCourse = asyncHandler( async (req, res, next) => {
         data:{}
     })
 });
+
