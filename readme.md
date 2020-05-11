@@ -26,7 +26,3 @@ node seeder -d
 # Import all data
 node seeder -i
 ```
-## Documentation Link!
-```
-https://documenter.getpostman.com/view/11250637/Szme3dUg
-```
