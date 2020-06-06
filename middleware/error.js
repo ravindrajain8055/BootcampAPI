@@ -15,7 +15,7 @@ const errorHandler = (err, req, res, next) => {
     }
 
     if(err.name === 'ValidationError'){
-        const message = Object.values(err.errors).map(val => val.nessage);
+        const message = Object.values(err.errors).map(val => val.message);
         error = new ErrorResponse(message,400)
     }
 
